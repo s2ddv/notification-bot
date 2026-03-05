@@ -1,5 +1,7 @@
 const axios = require('axios');
 
+console.log('CANVAS_URL:', process.env.CANVAS_URL);
+
 const api = axios.create({
     baseURL: process.env.CANVAS_URL,
     headers: { Authorization: `Bearer ${process.env.CANVAS_TOKEN}` }
