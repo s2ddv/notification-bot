@@ -1,6 +1,6 @@
 const axios = require('axios');
-const CANVAS_URL = process.env.CANVAS_URL;
-console.log('CANVAS_URL:', process.env.CANVAS_URL);
+const CANVAS_URL = process.env.CANVAS_URL || 'https://facens.instructure.com';
+console.log('CANVAS_URL:', CANVAS_URL);
 const api = axios.create({
     baseURL: process.env.CANVAS_URL, 
     headers: { Authorization: `Bearer ${process.env.CANVAS_TOKEN}` }
