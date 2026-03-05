@@ -1,4 +1,5 @@
 const axios = require('axios');
+const CANVAS_URL = process.env.CANVAS_URL;
 console.log('CANVAS_URL:', process.env.CANVAS_URL);
 const api = axios.create({
     baseURL: process.env.CANVAS_URL, 
