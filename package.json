@@ -1,0 +1,18 @@
+{
+  "name": "notification-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@whiskeysockets/baileys": "^7.0.0-rc.9",
+    "axios": "^1.13.6",
+    "better-sqlite3": "^12.6.2",
+    "node-cron": "^4.2.1"
+  }
+}
