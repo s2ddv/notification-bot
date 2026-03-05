@@ -1,6 +1,6 @@
 const cron = require('node-cron');
 const { getNewAssignments, getNewQuizzes } = require('./canvas');
-const { sendMessage } = require('./whatsapp');
+const { sendMessage, getQRCodeImage } = require('./whatsapp');
 const { isAlreadySent, markAsSent } = require('./database');
 const { formatAssignment, formatQuiz } = require('./formatter');
 const http = require('http');
@@ -29,9 +29,20 @@ cron.schedule('*/5 * * * *', async () => {
     console.log(`[${new Date().toISOString()}] Verificação concluída.`);
 });
 
-http.createServer((req, res) => {
-    res.writeHead(200);
-    res.end('Bot rodando!');
+http.createServer(async (req, res) => {
+    if (req.url === '/qr') {
+        const img = await getQRCodeImage();
+        if (!img) {
+            res.writeHead(200);
+            res.end('WhatsApp já conectado ou QR ainda não gerado. Aguarde e recarregue a página.');
+        } else {
+            res.writeHead(200, { 'Content-Type': 'text/html' });
+            res.end(`<img src="${img}" /><p>Escaneie com o WhatsApp</p>`);
+        }
+    } else {
+        res.writeHead(200);
+        res.end('Bot rodando!');
+    }
 }).listen(process.env.PORT || 3000);
 
 console.log('Bot iniciado. Verificando a cada 5 minutos...');

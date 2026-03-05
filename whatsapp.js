@@ -1,21 +1,30 @@
 const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
 const { Boom } = require('@hapi/boom');
+const QRCode = require('qrcode');
 
 let sock;
+let currentQR = null;
 
 async function connectWhatsApp() {
     const { state, saveCreds } = await useMultiFileAuthState('auth_info');
 
     sock = makeWASocket({
         auth: state,
-        printQRInTerminal: true
+        printQRInTerminal: false
     });
 
     sock.ev.on('creds.update', saveCreds);
 
     sock.ev.on('connection.update', (update) => {
-        const { connection, lastDisconnect } = update;
+        const { connection, lastDisconnect, qr } = update;
+
+        if (qr) {
+            currentQR = qr;
+            console.log('QR Code gerado. Acesse /qr no navegador para escanear.');
+        }
+
         if (connection === 'close') {
+            currentQR = null;
             const shouldReconnect = new Boom(lastDisconnect?.error)?.output?.statusCode !== DisconnectReason.loggedOut;
             if (shouldReconnect) {
                 console.log('Reconectando...');
@@ -24,9 +33,15 @@ async function connectWhatsApp() {
                 console.log('Desconectado. Faça login novamente.');
             }
         } else if (connection === 'open') {
+            currentQR = null;
             console.log('WhatsApp conectado!');
         }
     });
+}
+
+async function getQRCodeImage() {
+    if (!currentQR) return null;
+    return await QRCode.toDataURL(currentQR);
 }
 
 async function sendMessage(number, message) {
@@ -36,4 +51,4 @@ async function sendMessage(number, message) {
 
 connectWhatsApp();
 
-module.exports = { sendMessage };
+module.exports = { sendMessage, getQRCodeImage };
