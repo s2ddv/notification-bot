@@ -1,3 +1,5 @@
 node_modules/
 .env
 database.json
+database.db
+auth_info/
