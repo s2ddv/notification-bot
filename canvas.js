@@ -1,6 +1,14 @@
 const axios = require('axios');
 
-console.log('CANVAS_URL:', process.env.CANVAS_URL);
+const CANVAS_URL = process.env.CANVAS_URL;
+const CANVAS_TOKEN = process.env.CANVAS_TOKEN;
+
+console.log('CANVAS_URL:', CANVAS_URL);
+console.log('TOKEN existe:', !!CANVAS_TOKEN);
+
+if (!CANVAS_URL) {
+    throw new Error('CANVAS_URL não definida! Verifique as variáveis de ambiente.');
+}
 
 const api = axios.create({
     baseURL: process.env.CANVAS_URL,
