@@ -1,3 +1,4 @@
+require('dotenv').config();
 const cron = require('node-cron');
 const { getNewAssignments, getNewQuizzes } = require('./canvas');
 const { sendMessage, getQRCodeImage } = require('./whatsapp');
