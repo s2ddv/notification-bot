@@ -34,7 +34,15 @@ http.createServer(async (req, res) => {
         const img = await getQRCodeImage();
         if (!img) {
             res.writeHead(200);
-            res.end('WhatsApp já conectado ou QR ainda não gerado. Aguarde e recarregue a página.');
+            res.end(`
+                s<html>
+                <head><meta http-equiv="refresh" content="3"></head>
+                <body>
+                    <p>Aguardando QR Code... A página atualiza sozinha a cada 3 segundos.</p>
+                </body>
+                </html>
+                `
+            );
         } else {
             res.writeHead(200, { 'Content-Type': 'text/html' });
             res.end(`<img src="${img}" /><p>Escaneie com o WhatsApp</p>`);
