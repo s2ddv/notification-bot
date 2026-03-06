@@ -28,7 +28,9 @@ async function connectWhatsApp() {
             const shouldReconnect = new Boom(lastDisconnect?.error)?.output?.statusCode !== DisconnectReason.loggedOut;
             if (shouldReconnect) {
                 console.log('Reconectando...');
-                connectWhatsApp();
+                setTimeout(() => {
+                    connectWhatsApp();
+                }, 1000);
             } else {
                 console.log('Desconectado. Faça login novamente.');
             }
