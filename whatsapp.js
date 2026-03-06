@@ -1,9 +1,8 @@
 const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
 const { Boom } = require('@hapi/boom');
-const QRCode = require('qrcode');
+const readline = require('readline');
 
 let sock;
-let currentQR = null;
 
 async function connectWhatsApp() {
     const { state, saveCreds } = await useMultiFileAuthState('auth_info');
@@ -16,35 +15,31 @@ async function connectWhatsApp() {
 
     sock.ev.on('creds.update', saveCreds);
 
-    sock.ev.on('connection.update', (update) => {
-        const { connection, lastDisconnect, qr } = update;
+    if (!sock.authState.creds.registered) {
+        const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+        rl.question('Digite seu número de telefone (ex: 5515999999999): ', async (number) => {
+            rl.close();
+            const code = await sock.requestPairingCode(number);
+            console.log(`\nSeu código de pareamento: ${code}\n`);
+            console.log('Digite esse código no WhatsApp: Configurações > Dispositivos conectados > Conectar com número de telefone');
+        });
+    }
 
-        if (qr) {
-            currentQR = qr;
-            console.log('QR Code gerado. Acesse /qr no navegador para escanear.');
-        }
+    sock.ev.on('connection.update', (update) => {
+        const { connection, lastDisconnect } = update;
 
         if (connection === 'close') {
-            currentQR = null;
             const shouldReconnect = new Boom(lastDisconnect?.error)?.output?.statusCode !== DisconnectReason.loggedOut;
             if (shouldReconnect) {
                 console.log('Reconectando...');
-                setTimeout(() => {
-                    connectWhatsApp();
-                }, 10000);
+                setTimeout(connectWhatsApp, 3000);
             } else {
                 console.log('Desconectado. Faça login novamente.');
             }
         } else if (connection === 'open') {
-            currentQR = null;
             console.log('WhatsApp conectado!');
         }
     });
-}
-
-async function getQRCodeImage() {
-    if (!currentQR) return null;
-    return await QRCode.toDataURL(currentQR);
 }
 
 async function sendMessage(number, message) {
@@ -54,4 +49,4 @@ async function sendMessage(number, message) {
 
 connectWhatsApp();
 
-module.exports = { sendMessage, getQRCodeImage };
+module.exports = { sendMessage, getQRCodeImage: () => null };
