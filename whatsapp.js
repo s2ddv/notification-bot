@@ -1,9 +1,10 @@
 const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
 const { Boom } = require('@hapi/boom');
-const readline = require('readline');
 
 let sock;
 let paired = false;
+
+const PHONE_NUMBER = process.env.PHONE_NUMBER;
 
 async function connectWhatsApp() {
     const { state, saveCreds } = await useMultiFileAuthState('auth_info');
@@ -36,18 +37,16 @@ async function connectWhatsApp() {
     });
 
     if (!sock.authState.creds.registered) {
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-        rl.question('Digite seu número (ex: 5515999999999): ', async (number) => {
-            rl.close();
-            try {
-                const code = await sock.requestPairingCode(number.trim());
-                console.log(`\nCódigo de pareamento: ${code}`);
-                console.log('Vá no WhatsApp > Dispositivos conectados > Conectar com número de telefone e digite o código.');
-            } catch (err) {
-                console.error('Erro ao gerar código:', err.message);
-            }
-        });
+        try {
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            const code = await sock.requestPairingCode(PHONE_NUMBER);
+            console.log(`\n============================`);
+            console.log(`Código de pareamento: ${code}`);
+            console.log(`============================`);
+            console.log('Vá no WhatsApp > Dispositivos conectados > Conectar com número de telefone');
+        } catch (err) {
+            console.error('Erro ao gerar código:', err.message);
+        }
     }
 }
 
