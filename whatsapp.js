@@ -30,7 +30,7 @@ async function connectWhatsApp() {
                 console.log('Reconectando...');
                 setTimeout(() => {
                     connectWhatsApp();
-                }, 1000);
+                }, 10000);
             } else {
                 console.log('Desconectado. Faça login novamente.');
             }
